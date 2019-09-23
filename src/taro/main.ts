@@ -10,7 +10,7 @@ import * as text from "../util/text";
 import * as terminal from "../util/terminal";
 import * as sga from "../util/simpleGameActor";
 import { Vector } from "../util/vector";
-import { wrap, range, clamp } from "../util/math";
+import { wrap, range } from "../util/math";
 import * as sss from "sounds-some-sounds";
 
 type State = "title" | "inGame" | "gameOver";
@@ -103,35 +103,68 @@ function taro(a: Actor) {
         a.vel.y = -3 / Math.sqrt(gameSpeed);
       }
     });
+    sga.pool.get(coin).forEach((c: Actor) => {
+      if (a.testCollision(c)) {
+        c.remove();
+      }
+    });
   });
 }
 
+let arrowAddingPattern = 0;
+
 function arrow(a: Actor) {
-  const ap = random.getInt(6);
+  arrowAddingPattern = wrap(arrowAddingPattern + 1, 0, 6);
   a.animChar = "C";
-  switch (ap) {
+  switch (arrowAddingPattern) {
     case 0:
-    case 1:
-      a.pos.set(-3, ap === 0 ? 40 : random.get(10, 30));
+    case 3:
+      a.pos.set(-3, arrowAddingPattern === 0 ? 40 : random.get(20, 30));
       a.vel.set(0.4, 0);
       break;
-    case 2:
-    case 3:
-      a.pos.set(123, ap === 2 ? 40 : random.get(10, 30));
+    case 1:
+    case 4:
+      a.pos.set(123, arrowAddingPattern === 1 ? 40 : random.get(20, 30));
       a.vel.set(-0.4, 0);
       a.rotationPattern = "n";
       break;
-    case 4:
+    case 2:
     case 5:
       a.pos.set(random.get(0, 120), -3);
       a.vel.set(0, 0.3);
       a.rotationPattern = "l";
       break;
   }
+  if (random.get() < 0.1) {
+    const cp = new Vector(a.pos);
+    cp.x -= a.vel.x * 5;
+    cp.y -= a.vel.y * 5;
+    range(10).forEach(i => {
+      cp.x -= a.vel.x * 15;
+      cp.y -= a.vel.y * 15;
+      sga.spawn(coin, cp, a.vel);
+    });
+  }
   a.animInterval = 20;
   a.collidingRect.set(4, 1);
   a.addUpdater(() => {
     if (a.pos.x < -6 || a.pos.x > 126 || a.pos.y > 40) {
+      a.remove();
+    }
+  });
+}
+
+function coin(a: Actor, p: Vector, v: Vector) {
+  a.pos.set(p);
+  a.vel.set(v);
+  a.animChar = "E";
+  a.animInterval = 15;
+  a.addUpdater(() => {
+    if (
+      (a.vel.x < 0 && a.pos.x < -6) ||
+      (a.vel.x > 0 && a.pos.x > 126) ||
+      a.pos.y > 40
+    ) {
       a.remove();
     }
   });
@@ -230,5 +263,15 @@ ww  w
 ww ww
  wwwww
 ww ww
+`,
+  `
+w
+w
+w
+`,
+  `
+ w
+www
+ w
 `
 ];
