@@ -89,7 +89,7 @@ export function update() {
         }
       }
       if (isKeyReleased[k]) {
-        isKeyReleased[k] = true;
+        isKeyReleased[k] = false;
         isStickJustReleased[i] = true;
         if (options.isUsingStickKeysAsButton && pp) {
           isJustReleased = true;
