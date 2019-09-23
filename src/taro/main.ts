@@ -93,6 +93,7 @@ function taro(a: Actor) {
   let coinTicks = 0;
   let coinMultiplier = 1;
   let invincibleTicks = 0;
+  let isFirstPress = true;
   a.vel.set(0.3, 0);
   a.pos.set(60, 40);
   a.addUpdater(() => {
@@ -118,9 +119,13 @@ function taro(a: Actor) {
       }
     } else {
       if (isJustReleased) {
-        sss.play("j_jm0");
-        isJumping = true;
-        a.vel.y = -2 / Math.sqrt(gameSpeed);
+        if (isFirstPress) {
+          isFirstPress = false;
+        } else {
+          sss.play("j_jm0");
+          isJumping = true;
+          a.vel.y = -2 / Math.sqrt(gameSpeed);
+        }
       }
     }
     a.rotationPattern = a.vel.x > 0 ? "k" : "n";
