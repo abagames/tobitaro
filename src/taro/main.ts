@@ -11,7 +11,6 @@ import * as terminal from "../util/terminal";
 import * as sga from "../util/simpleGameActor";
 import { Vector } from "../util/vector";
 import { wrap, range, clamp } from "../util/math";
-import { Random } from "../util/random";
 import * as sss from "sounds-some-sounds";
 
 type State = "title" | "inGame" | "gameOver";
@@ -42,12 +41,24 @@ function update() {
   ticks++;
 }
 
+let arrowSpawnTicks: number;
+
 function initInGame() {
   state = "inGame";
+  ticks = 0;
+  arrowSpawnTicks = 0;
   sga.spawn(taro);
 }
 
+let gameSpeed: number;
+
 function updateInGame() {
+  gameSpeed = 1 + ticks * 0.0005;
+  arrowSpawnTicks--;
+  if (arrowSpawnTicks < 0) {
+    arrowSpawnTicks = (100 / gameSpeed) * random.get(0.5, 1);
+    sga.spawn(arrow);
+  }
   view.clear();
   view.context.fillStyle = "black";
   view.context.fillRect(0, 43, 120, 17);
@@ -57,9 +68,14 @@ function updateInGame() {
 
 function taro(a: Actor) {
   let isJumping = false;
-  a.pos.set(60, 40);
+  let isDead = false;
   a.vel.set(0.3, 0);
+  a.pos.set(60, 40);
   a.addUpdater(() => {
+    if (isDead) {
+      a.vel.y += 0.2;
+      return;
+    }
     a.pos.clamp(0, 120, 0, 60);
     if (isJustPressed) {
       a.vel.x *= -1;
@@ -74,10 +90,50 @@ function taro(a: Actor) {
     } else {
       if (isJustReleased) {
         isJumping = true;
-        a.vel.y = -2;
+        a.vel.y = -2 / Math.sqrt(gameSpeed);
       }
     }
     a.rotationPattern = a.vel.x > 0 ? "k" : "n";
+    sga.pool.get(arrow).forEach((ar: Actor) => {
+      if (a.testCollision(ar)) {
+        isDead = true;
+        a.rotationPattern = a.vel.x > 0 ? "j" : "b";
+        a.animInterval = 9999999;
+        a.vel.x *= -2;
+        a.vel.y = -3 / Math.sqrt(gameSpeed);
+      }
+    });
+  });
+}
+
+function arrow(a: Actor) {
+  const ap = random.getInt(6);
+  a.animChar = "C";
+  switch (ap) {
+    case 0:
+    case 1:
+      a.pos.set(-3, ap === 0 ? 40 : random.get(10, 30));
+      a.vel.set(0.4, 0);
+      break;
+    case 2:
+    case 3:
+      a.pos.set(123, ap === 2 ? 40 : random.get(10, 30));
+      a.vel.set(-0.4, 0);
+      a.rotationPattern = "n";
+      break;
+    case 4:
+    case 5:
+      a.pos.set(random.get(0, 120), -3);
+      a.vel.set(0, 0.3);
+      a.rotationPattern = "l";
+      break;
+  }
+  a.animInterval = 20;
+  a.collidingRect.set(4, 1);
+  a.addUpdater(() => {
+    if (a.pos.x < -6 || a.pos.x > 126 || a.pos.y > 40) {
+      a.remove();
+    }
   });
 }
 
@@ -91,11 +147,13 @@ class Actor extends sga.Actor {
   animIndex = 0;
   animIndexVel = 1;
   rotationPattern = "k";
+  collidingRect = new Vector(4, 4);
 
   update() {
     super.update();
-    this.pos.add(this.vel);
-    if (ticks % this.animInterval === 0) {
+    this.pos.x += this.vel.x * gameSpeed;
+    this.pos.y += this.vel.y * gameSpeed;
+    if (this.ticks % this.animInterval === 0) {
       this.animIndex += this.animIndexVel;
       if (this.animIndex < 0 || this.animIndex >= this.animCount) {
         this.animIndexVel *= -1;
@@ -111,6 +169,15 @@ class Actor extends sga.Actor {
         symbolPattern: "s",
         rotationPattern: this.rotationPattern
       }
+    );
+  }
+
+  testCollision(aa: Actor) {
+    return (
+      Math.abs(this.pos.x - aa.pos.x) <
+        (this.collidingRect.x + aa.collidingRect.x) / 2 &&
+      Math.abs(this.pos.y - aa.pos.y) <
+        (this.collidingRect.y + aa.collidingRect.y) / 2
     );
   }
 }
@@ -153,5 +220,15 @@ ww w w
 ww w w
 wwwwww
 ww  ww
+`,
+  `
+ww  w
+wwwwww
+ww  w
+`,
+  `
+ww ww
+ wwwww
+ww ww
 `
 ];
