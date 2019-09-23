@@ -21,6 +21,7 @@ let updateFunc = {
   gameOver: updateGameOver
 };
 let ticks = 0;
+let score = 0;
 
 utilInit(init, update, {
   viewSize: { x: 120, y: 60 },
@@ -37,7 +38,13 @@ function init() {
 }
 
 function update() {
+  view.clear();
+  terminal.clear();
   updateFunc[state]();
+  if (score > 0) {
+    terminal.print(`${score}`, 0, 0, { colorPattern: "lllllll" });
+  }
+  terminal.draw();
   ticks++;
 }
 
@@ -59,16 +66,16 @@ function updateInGame() {
     arrowSpawnTicks = (100 / gameSpeed) * random.get(0.5, 1);
     sga.spawn(arrow);
   }
-  view.clear();
   view.context.fillStyle = "black";
   view.context.fillRect(0, 43, 120, 17);
-  terminal.draw();
   sga.update();
 }
 
 function taro(a: Actor) {
   let isJumping = false;
   let isDead = false;
+  let coinTicks = 0;
+  let coinMultiplier = 1;
   a.vel.set(0.3, 0);
   a.pos.set(60, 40);
   a.addUpdater(() => {
@@ -105,9 +112,22 @@ function taro(a: Actor) {
     });
     sga.pool.get(coin).forEach((c: Actor) => {
       if (a.testCollision(c)) {
+        score += coinMultiplier;
+        coinMultiplier++;
+        coinTicks = 60;
         c.remove();
       }
     });
+    if (coinTicks > 0) {
+      coinTicks--;
+      if (coinTicks === 0) {
+        coinMultiplier = 1;
+      }
+      if (coinMultiplier > 1) {
+        const ms = `+${coinMultiplier}`;
+        terminal.print(ms, 20 - ms.length, 0, { colorPattern: "lllll" });
+      }
+    }
   });
 }
 
@@ -135,11 +155,11 @@ function arrow(a: Actor) {
       a.rotationPattern = "l";
       break;
   }
-  if (random.get() < 0.1) {
+  if (random.get() < 0.2) {
     const cp = new Vector(a.pos);
     cp.x -= a.vel.x * 5;
     cp.y -= a.vel.y * 5;
-    range(10).forEach(i => {
+    range(9).forEach(i => {
       cp.x -= a.vel.x * 15;
       cp.y -= a.vel.y * 15;
       sga.spawn(coin, cp, a.vel);
