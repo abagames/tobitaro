@@ -10,7 +10,7 @@ import * as text from "../util/text";
 import * as terminal from "../util/terminal";
 import * as sga from "../util/simpleGameActor";
 import { Vector } from "../util/vector";
-import { wrap, range, clamp } from "../util/math";
+import { range } from "../util/math";
 import * as sss from "sounds-some-sounds";
 
 type State = "title" | "inGame" | "gameOver";
@@ -31,7 +31,7 @@ utilInit(init, update, {
 });
 
 function init() {
-  sss.init(10); //5);
+  sss.init(10);
   sga.setActorClass(Actor);
   text.defineSymbols(charPatterns, "A");
   initTitle();
@@ -63,6 +63,7 @@ let nextExtendScore: number;
 let isExtending: boolean;
 
 function initInGame() {
+  sss.playJingle("l_st");
   state = "inGame";
   sga.reset();
   ticks = 0;
@@ -73,7 +74,6 @@ function initInGame() {
   nextExtendScore = 100;
   isExtending = false;
   sga.spawn(taro);
-  sss.playJingle("l_st");
 }
 
 function updateInGame() {
@@ -106,8 +106,8 @@ function taro(a: Actor) {
     }
     a.pos.clamp(0, 120, 0, 60);
     if (isJustPressed) {
-      a.vel.x *= -1;
       sss.play("l_tn");
+      a.vel.x *= -1;
     }
     if (isJumping) {
       a.vel.y += 0.1;
@@ -118,15 +118,15 @@ function taro(a: Actor) {
       }
     } else {
       if (isJustReleased) {
+        sss.play("j_jm0");
         isJumping = true;
         a.vel.y = -2 / Math.sqrt(gameSpeed);
-        sss.play("j_jm0");
       }
     }
     a.rotationPattern = a.vel.x > 0 ? "k" : "n";
     if (invincibleTicks <= 0) {
       sga.pool.get(arrow).forEach((ar: Actor) => {
-        if (a.testCollision(ar)) {
+        if (invincibleTicks <= 0 && a.testCollision(ar)) {
           sss.playJingle("l_ht2", true);
           if (lifeHearts.length > 0) {
             lifeHearts[lifeHearts.length - 1].dead();
@@ -336,6 +336,12 @@ function initTitle() {
 
 function updateTitle() {
   terminal.print("TOBITARO", 6, 3, { colorPattern: "lllllllll" });
+  if (ticks > 30) {
+    terminal.print("[Press]   Turn", 3, 8);
+  }
+  if (ticks > 60) {
+    terminal.print("[Release] Jump", 3, 9);
+  }
   if (isJustPressed) {
     initInGame();
   }
