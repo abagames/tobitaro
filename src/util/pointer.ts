@@ -8,6 +8,7 @@ export const pressedPos = new Vector();
 export const targetPos = new Vector();
 export let isPressed = false;
 export let isJustPressed = false;
+export let isJustReleased = false;
 
 type Options = {
   isDebugMode?: boolean;
@@ -34,6 +35,7 @@ let debugIsDown = false;
 let cursorPos = new Vector(-9999, -9999);
 let isDown = false;
 let isClicked = false;
+let isReleased = false;
 let isResettingTargetPos = false;
 
 export function init(
@@ -88,9 +90,11 @@ export function update() {
     updateDebug();
     pos.set(debugPos);
     isJustPressed = !isPressed && debugIsDown;
+    isJustReleased = isPressed && !debugIsDown;
     isPressed = debugIsDown;
   } else {
     isJustPressed = !isPressed && isClicked;
+    isJustReleased = isPressed && isReleased;
     isPressed = isDown;
   }
   if (isJustPressed) {
@@ -104,7 +108,7 @@ export function update() {
   } else {
     targetPos.add(move);
   }
-  isClicked = false;
+  isClicked = isReleased = false;
 }
 
 export function clearJustPressed() {
@@ -185,6 +189,7 @@ function onMove(x: number, y: number) {
 
 function onUp(e: Event) {
   isDown = false;
+  isReleased = true;
   isResettingTargetPos = false;
   if (options.onPointerDownOrUp != null) {
     options.onPointerDownOrUp();

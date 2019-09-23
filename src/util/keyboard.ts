@@ -3,10 +3,12 @@ import { range, wrap } from "./math";
 
 export let isPressed = false;
 export let isJustPressed = false;
+export let isJustReleased = false;
 export const stick = new Vector();
 export let stickAngle: number;
 export const isStickPressed = range(4).map(() => false);
 export const isStickJustPressed = range(4).map(() => false);
+export const isStickJustReleased = range(4).map(() => false);
 
 type Options = {
   isUsingStickKeysAsButton?: boolean;
@@ -22,6 +24,7 @@ let options: Options;
 
 const isKeyPressing = range(256).map(() => false);
 const isKeyPressed = range(256).map(() => false);
+const isKeyReleased = range(256).map(() => false);
 const stickKeys = [
   [39, 68, 102],
   [40, 83, 101, 98],
@@ -57,14 +60,15 @@ export function init(_options?: Options) {
   });
   document.addEventListener("keyup", e => {
     isKeyPressing[e.keyCode] = false;
+    isKeyReleased[e.keyCode] = true;
   });
 }
 
 export function update() {
   const pp = isPressed;
-  isPressed = isJustPressed = false;
+  isPressed = isJustPressed = isJustReleased = false;
   range(4).forEach(i => {
-    isStickPressed[i] = isStickJustPressed[i] = false;
+    isStickPressed[i] = isStickJustPressed[i] = isStickJustReleased[i] = false;
   });
   stick.set(0);
   stickKeys.forEach((ks, i) => {
@@ -84,6 +88,13 @@ export function update() {
           }
         }
       }
+      if (isKeyReleased[k]) {
+        isKeyReleased[k] = true;
+        isStickJustReleased[i] = true;
+        if (options.isUsingStickKeysAsButton && pp) {
+          isJustReleased = true;
+        }
+      }
     });
   });
   stickAngle = -1;
@@ -98,6 +109,12 @@ export function update() {
       isKeyPressed[k] = false;
       if (!pp) {
         isPressed = isJustPressed = true;
+      }
+    }
+    if (isKeyReleased[k]) {
+      isKeyReleased[k] = false;
+      if (pp) {
+        isJustReleased = true;
       }
     }
   });

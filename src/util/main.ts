@@ -18,6 +18,7 @@ export type Options = {
 export let stickAngle = 0;
 export let isPressed = false;
 export let isJustPressed = false;
+export let isJustReleased = false;
 export const random = new Random();
 let centerPos = new Vector();
 let offsetFromCenter = new Vector();
@@ -96,6 +97,7 @@ function update() {
   }
   isPressed = keyboard.isPressed || pointer.isPressed;
   isJustPressed = keyboard.isJustPressed || pointer.isJustPressed;
+  isJustReleased = keyboard.isJustReleased || pointer.isJustReleased;
   _update();
   view.update();
   if (options.isUsingVirtualPad && pointer.isPressed) {
