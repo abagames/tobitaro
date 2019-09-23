@@ -127,7 +127,9 @@ function taro(a: Actor) {
     if (invincibleTicks <= 0) {
       sga.pool.get(arrow).forEach((ar: Actor) => {
         if (invincibleTicks <= 0 && a.testCollision(ar)) {
+          sss.setQuantize(0);
           sss.playJingle("l_ht2", true);
+          sss.setQuantize(0.5);
           if (lifeHearts.length > 0) {
             lifeHearts[lifeHearts.length - 1].dead();
             lifeHearts.pop();
