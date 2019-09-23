@@ -31,7 +31,7 @@ utilInit(init, update, {
 });
 
 function init() {
-  sss.init(0);
+  sss.init(10); //5);
   sga.setActorClass(Actor);
   text.defineSymbols(charPatterns, "A");
   initTitle();
@@ -73,6 +73,7 @@ function initInGame() {
   nextExtendScore = 100;
   isExtending = false;
   sga.spawn(taro);
+  sss.playJingle("l_st");
 }
 
 function updateInGame() {
@@ -80,6 +81,9 @@ function updateInGame() {
   if (score >= nextExtendScore) {
     nextExtendScore += 100;
     isExtending = true;
+  }
+  if (ticks === 150) {
+    sss.playBgm();
   }
 }
 
@@ -103,6 +107,7 @@ function taro(a: Actor) {
     a.pos.clamp(0, 120, 0, 60);
     if (isJustPressed) {
       a.vel.x *= -1;
+      sss.play("l_tn");
     }
     if (isJumping) {
       a.vel.y += 0.1;
@@ -115,17 +120,20 @@ function taro(a: Actor) {
       if (isJustReleased) {
         isJumping = true;
         a.vel.y = -2 / Math.sqrt(gameSpeed);
+        sss.play("j_jm0");
       }
     }
     a.rotationPattern = a.vel.x > 0 ? "k" : "n";
     if (invincibleTicks <= 0) {
       sga.pool.get(arrow).forEach((ar: Actor) => {
         if (a.testCollision(ar)) {
+          sss.playJingle("l_ht2", true);
           if (lifeHearts.length > 0) {
             lifeHearts[lifeHearts.length - 1].dead();
             lifeHearts.pop();
             invincibleTicks = 100;
           } else {
+            sss.stopBgm();
             isDead = true;
             a.rotationPattern = a.vel.x > 0 ? "j" : "b";
             a.animInterval = 9999999;
@@ -141,6 +149,7 @@ function taro(a: Actor) {
     }
     sga.pool.get(coin).forEach((c: Actor) => {
       if (a.testCollision(c)) {
+        sss.play("c_cg0");
         score += coinMultiplier;
         coinMultiplier++;
         coinTicks = 60;
@@ -159,6 +168,7 @@ function taro(a: Actor) {
     }
     sga.pool.get(extendHeart).forEach((e: Actor) => {
       if (a.testCollision(e)) {
+        sss.play("p_ex");
         lifeHearts.push(sga.spawn(heart, lifeHearts.length));
         e.remove();
       }
