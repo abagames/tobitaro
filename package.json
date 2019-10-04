@@ -7,7 +7,8 @@
   },
   "scripts": {
     "watch": "cross-conf-env parcel src/%npm_package_config_game%/index.html -d tmp",
-    "build": "cross-conf-env parcel build src/%npm_package_config_game%/index.html -d docs/%npm_package_config_game% --no-source-maps --public-url ./"
+    "build": "cross-conf-env parcel build src/%npm_package_config_game%/index.html -d docs/%npm_package_config_game% --no-source-maps --public-url ./",
+    "build_tobi": "parcel build src/tobi/tobi.ts -d docs/tobi --no-source-maps --global tobi"
   },
   "author": "abagames",
   "license": "MIT",
