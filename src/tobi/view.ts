@@ -77,7 +77,7 @@ export function drawBackground() {
   context.drawImage(background, 0, 0);
 }
 
-export function update() {
+export function capture() {
   if (isCapturing) {
     captureContext.fillRect(0, 0, captureCanvas.width, captureCanvas.height);
     captureContext.drawImage(

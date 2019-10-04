@@ -1,17 +1,13 @@
-import {
-  init as utilInit,
-  isJustPressed,
-  random,
-  clearJustPressed,
-  isJustReleased
-} from "../tobi/tobi";
+import * as tobi from "../tobi/tobi";
 import * as view from "../tobi/view";
 import * as text from "../tobi/text";
 import * as terminal from "../tobi/terminal";
-import * as sga from "../tobi/simpleGameActor";
+import * as input from "../tobi/input";
+import * as actor from "../tobi/actor";
+import { Random } from "../tobi/random";
 import { Vector } from "../tobi/vector";
 import { range } from "../tobi/math";
-import * as sss from "sounds-some-sounds";
+import * as sound from "sounds-some-sounds";
 
 type State = "title" | "inGame" | "gameOver";
 let state: State;
@@ -22,8 +18,9 @@ let updateFunc = {
 };
 let ticks = 0;
 let score = 0;
+let random = new Random();
 
-utilInit(init, update, {
+tobi.init(init, update, {
   viewSize: { x: 120, y: 60 },
   bodyBackground: "#ddd",
   viewBackground: "#eee",
@@ -31,8 +28,8 @@ utilInit(init, update, {
 });
 
 function init() {
-  sss.init(10);
-  sga.setActorClass(Actor);
+  sound.init(10);
+  actor.setActorClass(Actor);
   text.defineSymbols(charPatterns, "A");
   initTitle();
 }
@@ -45,10 +42,10 @@ function update() {
   arrowSpawnTicks--;
   if (arrowSpawnTicks < 0) {
     arrowSpawnTicks = (100 / gameSpeed) * random.get(0.75, 1);
-    sga.spawn(arrow);
+    actor.spawn(arrow);
   }
   updateFunc[state]();
-  sga.update();
+  actor.update();
   if (score > 0) {
     terminal.print(`${score}`, 0, 0, { colorPattern: "lllllll" });
   }
@@ -63,17 +60,17 @@ let nextExtendScore: number;
 let isExtending: boolean;
 
 function initInGame() {
-  sss.playJingle("l_st");
+  sound.playJingle("l_st");
   state = "inGame";
-  sga.reset();
+  actor.reset();
   ticks = 0;
   score = 0;
-  lifeHearts = range(2).map(i => sga.spawn(heart, i));
+  lifeHearts = range(2).map(i => actor.spawn(heart, i));
   gameSpeed = 1;
   arrowSpawnTicks = 0;
   nextExtendScore = 100;
   isExtending = false;
-  sga.spawn(taro);
+  actor.spawn(taro);
 }
 
 function updateInGame() {
@@ -83,7 +80,7 @@ function updateInGame() {
     isExtending = true;
   }
   if (ticks === 150) {
-    sss.playBgm();
+    sound.playBgm();
   }
 }
 
@@ -106,8 +103,8 @@ function taro(a: Actor) {
       return;
     }
     a.pos.clamp(0, 120, 0, 60);
-    if (isJustPressed) {
-      sss.play("l_tn");
+    if (input.isJustPressed) {
+      sound.play("l_tn");
       a.vel.x *= -1;
     }
     if (isJumping) {
@@ -118,11 +115,11 @@ function taro(a: Actor) {
         a.pos.y = 40;
       }
     } else {
-      if (isJustReleased) {
+      if (input.isJustReleased) {
         if (isFirstPress) {
           isFirstPress = false;
         } else {
-          sss.play("j_jm0");
+          sound.play("j_jm0");
           isJumping = true;
           a.vel.y = -2 / Math.sqrt(gameSpeed);
         }
@@ -130,17 +127,17 @@ function taro(a: Actor) {
     }
     a.rotationPattern = a.vel.x > 0 ? "k" : "n";
     if (invincibleTicks <= 0) {
-      sga.pool.get(arrow).forEach((ar: Actor) => {
+      actor.pool.get(arrow).forEach((ar: Actor) => {
         if (invincibleTicks <= 0 && a.testCollision(ar)) {
-          sss.setQuantize(0);
-          sss.playJingle("l_ht2", true);
-          sss.setQuantize(0.5);
+          sound.setQuantize(0);
+          sound.playJingle("l_ht2", true);
+          sound.setQuantize(0.5);
           if (lifeHearts.length > 0) {
             lifeHearts[lifeHearts.length - 1].dead();
             lifeHearts.pop();
             invincibleTicks = 100;
           } else {
-            sss.stopBgm();
+            sound.stopBgm();
             isDead = true;
             a.rotationPattern = a.vel.x > 0 ? "j" : "b";
             a.animInterval = 9999999;
@@ -154,9 +151,9 @@ function taro(a: Actor) {
       a.colorPattern =
         invincibleTicks > 0 && invincibleTicks % 30 < 15 ? "w" : "l";
     }
-    sga.pool.get(coin).forEach((c: Actor) => {
+    actor.pool.get(coin).forEach((c: Actor) => {
       if (a.testCollision(c)) {
-        sss.play("c_cg0");
+        sound.play("c_cg0");
         score += coinMultiplier;
         coinMultiplier++;
         coinTicks = 60;
@@ -173,10 +170,10 @@ function taro(a: Actor) {
         terminal.print(ms, 20 - ms.length, 0, { colorPattern: "lllll" });
       }
     }
-    sga.pool.get(extendHeart).forEach((e: Actor) => {
+    actor.pool.get(extendHeart).forEach((e: Actor) => {
       if (a.testCollision(e)) {
-        sss.play("p_ex");
-        lifeHearts.push(sga.spawn(heart, lifeHearts.length));
+        sound.play("p_ex");
+        lifeHearts.push(actor.spawn(heart, lifeHearts.length));
         e.remove();
       }
     });
@@ -212,7 +209,7 @@ function arrow(a: Actor) {
       const ep = new Vector(a.pos);
       ep.x -= a.vel.x * 25;
       ep.y -= a.vel.y * 25;
-      sga.spawn(extendHeart, ep, a.vel, a.rotationPattern);
+      actor.spawn(extendHeart, ep, a.vel, a.rotationPattern);
     }
     isExtending = false;
   } else if (random.get() < 0.2) {
@@ -222,7 +219,7 @@ function arrow(a: Actor) {
     range(9).forEach(i => {
       cp.x -= a.vel.x * 15;
       cp.y -= a.vel.y * 15;
-      sga.spawn(coin, cp, a.vel, a.rotationPattern);
+      actor.spawn(coin, cp, a.vel, a.rotationPattern);
     });
   }
   a.animInterval = 20;
@@ -290,7 +287,7 @@ function heart(a: Actor & { dead: Function }, i: number) {
   };
 }
 
-class Actor extends sga.Actor {
+class Actor extends actor.Actor {
   pos = new Vector();
   vel = new Vector();
   animInterval = 30;
@@ -349,20 +346,20 @@ function updateTitle() {
   if (ticks > 60) {
     terminal.print("[Release] Jump", 3, 9);
   }
-  if (isJustPressed) {
+  if (input.isJustPressed) {
     initInGame();
   }
 }
 
 function initGameOver() {
   state = "gameOver";
-  clearJustPressed();
+  input.clearJustPressed();
   ticks = 0;
 }
 
 function updateGameOver() {
   terminal.print("GAME OVER", 5, 3, { colorPattern: "lllllllll" });
-  if (ticks > 20 && isJustPressed) {
+  if (ticks > 20 && input.isJustPressed) {
     initInGame();
   } else if (ticks > 300) {
     initTitle();
