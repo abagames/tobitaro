@@ -17,8 +17,6 @@ image-rendering: -o-crisp-edges;
 image-rendering: pixelated;
 `;
 let background = document.createElement("img");
-
-const isCapturing = false;
 let captureCanvas: HTMLCanvasElement;
 let captureContext: CanvasRenderingContext2D;
 let viewBackground = "black";
@@ -26,7 +24,8 @@ let viewBackground = "black";
 export function init(
   _size: VectorLike,
   _bodyBackground: string,
-  _viewBackground: string
+  _viewBackground: string,
+  isCapturing: boolean
 ) {
   size.set(_size);
   viewBackground = _viewBackground;
@@ -78,13 +77,7 @@ export function drawBackground() {
 }
 
 export function capture() {
-  if (isCapturing) {
-    captureContext.fillRect(0, 0, captureCanvas.width, captureCanvas.height);
-    captureContext.drawImage(
-      canvas,
-      (captureCanvas.width - canvas.width) / 2,
-      0
-    );
-    gcc.capture(captureCanvas);
-  }
+  captureContext.fillRect(0, 0, captureCanvas.width, captureCanvas.height);
+  captureContext.drawImage(canvas, (captureCanvas.width - canvas.width) / 2, 0);
+  gcc.capture(captureCanvas);
 }

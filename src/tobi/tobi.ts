@@ -1,7 +1,7 @@
 import * as view from "./view";
-import * as input from "./input";
 import * as text from "./text";
 import * as terminal from "./terminal";
+import * as input from "./input";
 import { VectorLike } from "./vector";
 import * as sound from "sounds-some-sounds";
 
@@ -11,6 +11,7 @@ export type Options = {
   viewBackground?: string;
   isUsingVirtualPad?: boolean;
   isFourWaysStick?: boolean;
+  isCapturing?: boolean;
 };
 
 let lastFrameTime = 0;
@@ -21,10 +22,11 @@ const defaultOptions: Options = {
   bodyBackground: "#111",
   viewBackground: "black",
   isUsingVirtualPad: true,
-  isFourWaysStick: false
+  isFourWaysStick: false,
+  isCapturing: false
 };
 let options: Options;
-let ticks = 0;
+let textCacheEnableTicks = 10;
 
 export function init(
   __init: () => void,
@@ -38,7 +40,12 @@ export function init(
 }
 
 function onLoad() {
-  view.init(options.viewSize, options.bodyBackground, options.viewBackground);
+  view.init(
+    options.viewSize,
+    options.bodyBackground,
+    options.viewBackground,
+    options.isCapturing
+  );
   input.init(options.isUsingVirtualPad, options.isFourWaysStick);
   const terminalSize = {
     x: Math.ceil(view.size.x / text.letterSize),
@@ -61,9 +68,11 @@ function update() {
   sound.update();
   input.update();
   _update();
-  view.capture();
-  ticks++;
-  if (ticks === 10) {
+  if (options.isCapturing) {
+    view.capture();
+  }
+  textCacheEnableTicks--;
+  if (textCacheEnableTicks === 0) {
     text.enableCache();
   }
 }
