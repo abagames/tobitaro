@@ -175,6 +175,10 @@ export function reset() {
   updaterPool.removeAll();
 }
 
+export function get(func?: Function) {
+  pool.get(func);
+}
+
 export function setActorClass(_actorClass: any) {
   actorClass = _actorClass;
 }

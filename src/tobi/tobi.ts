@@ -2,8 +2,13 @@ import * as view from "./view";
 import * as text from "./text";
 import * as terminal from "./terminal";
 import * as input from "./input";
-import { VectorLike } from "./vector";
 import * as sound from "sounds-some-sounds";
+import { Vector, VectorLike } from "./vector";
+export { view, text, terminal, input, sound, Vector, VectorLike };
+export * from "./actor";
+export * from "./debug";
+export { clamp, wrap, isInRange, range, stableSort } from "./math";
+export { Random } from "./random";
 
 export type Options = {
   viewSize?: VectorLike;
