@@ -1,5 +1,5 @@
 export const symbolPatterns = [
-  // A
+  // a
   `
   w
    w
@@ -7,7 +7,7 @@ wwwww
    w
   w
 `,
-  // B
+  // b
   `
 wwwwww
 wwwwww
@@ -16,14 +16,14 @@ wwwww
 wwww
 ww
 `,
-  // C
+  // c
   `
  ww
 wwww
 wwww
  ww
 `,
-  // D
+  // d
   `
 www
 www
@@ -32,7 +32,7 @@ www
 
 
 `,
-  // E
+  // e
   `
   w
   w
@@ -41,7 +41,7 @@ www
   w
   w  
 `,
-  // F
+  // f
   `
 wwwwww
 wwwwww
@@ -50,7 +50,7 @@ wwwwww
 
 
 `,
-  // G
+  // g
   `
 www
 www
@@ -59,14 +59,14 @@ www
    www
    www
 `,
-  // H
+  // h
   `
 wwww
 w  w
 w  w
 wwww
 `,
-  // I
+  // i
   `
   w
  w w
@@ -74,7 +74,7 @@ wwww
 w   w
 wwwww
 `,
-  // J
+  // j
   `
   w
   w
@@ -83,7 +83,7 @@ www
 
 
 `,
-  // K
+  // k
   `
   w
   w
@@ -92,7 +92,7 @@ wwwwww
 
 
 `,
-  // L
+  // l
   `
   w
   w
@@ -101,7 +101,7 @@ wwwwwww
   w
   w
 `,
-  // M
+  // m
   `
   w
   w
@@ -110,14 +110,14 @@ ww
 
 
 `,
-  // N
+  // n
   `
  ww
 w  w
 w  w
  ww
 `,
-  // O
+  // o
   `
   w
  w
@@ -126,7 +126,7 @@ w
 
 
 `,
-  // P
+  // p
   `
      w
     w
@@ -135,7 +135,7 @@ w
  w
 w
 `,
-  // Q
+  // q
   `
   ww
   ww
@@ -144,7 +144,7 @@ wwwwww
  w  w
 w    w
 `,
-  // R
+  // r
   `
  wwww
 w    w
@@ -153,14 +153,14 @@ w    w
 w ww w
  wwww 
 `,
-  // S
+  // s
   `
 wwww
 wwww
 wwww
 wwww
 `,
-  // T
+  // t
   `
   w
  www
@@ -168,7 +168,7 @@ wwww
 wwwww
 wwwww
 `,
-  // U
+  // u
   `
 wwwwww
 wwwww
@@ -177,7 +177,7 @@ www
 ww
 w
 `,
-  // V
+  // v
   `
 www
 www
@@ -186,7 +186,7 @@ ww
 
 
 `,
-  // W
+  // w
   `
 w w w
  w w w
@@ -195,7 +195,7 @@ w w w
 w w w
  w w w
 `,
-  // X
+  // x
   `
 w    w
  w  w
@@ -204,7 +204,7 @@ w    w
  w  w
 w    w
 `,
-  // Y
+  // y
   `
 www
 ww
@@ -213,7 +213,7 @@ w
 
 
 `,
-  // Z
+  // z
   `
 w
  w
