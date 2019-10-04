@@ -1,178 +1,180 @@
 import * as text from "./text";
-import { range, wrap } from "./math";
+import { range } from "./math";
 import { Vector, VectorLike } from "./vector";
 
-export let size = new Vector();
-let charGrid: string[][];
-let colorGrid: string[][];
-let backgroundColorGrid: string[][];
-let rotationGrid: string[][];
-let symbolGrid: string[][];
+export class Terminal {
+  size = new Vector();
+  charGrid: string[][];
+  colorGrid: string[][];
+  backgroundColorGrid: string[][];
+  rotationGrid: string[][];
+  symbolGrid: string[][];
 
-export function init(_size: VectorLike) {
-  size.set(_size);
-  charGrid = range(size.x).map(() => range(size.y).map(() => undefined));
-  colorGrid = range(size.x).map(() => range(size.y).map(() => undefined));
-  backgroundColorGrid = range(size.x).map(() =>
-    range(size.y).map(() => undefined)
-  );
-  rotationGrid = range(size.x).map(() => range(size.y).map(() => undefined));
-  symbolGrid = range(size.x).map(() => range(size.y).map(() => undefined));
-}
-
-export function print(
-  _str: string,
-  _x: number,
-  _y: number,
-  options: text.Options = {}
-) {
-  let x = Math.floor(_x);
-  let y = Math.floor(_y);
-  const bx = x;
-  let colorLines =
-    options.colorPattern != null ? options.colorPattern.split("\n") : undefined;
-  const backgroundColorLines =
-    options.backgroundColorPattern != null
-      ? options.backgroundColorPattern.split("\n")
-      : undefined;
-  const rotationLines =
-    options.rotationPattern != null
-      ? options.rotationPattern.split("\n")
-      : undefined;
-  const symbolLines =
-    options.symbolPattern != null
-      ? options.symbolPattern.split("\n")
-      : undefined;
-  let str = _str;
-  if (options.charAndColorPattern != null) {
-    const [_lines, _colorLines] = text.getColorLines(
-      options.charAndColorPattern
+  constructor(_size: VectorLike) {
+    this.size.set(_size);
+    this.charGrid = range(this.size.x).map(() =>
+      range(this.size.y).map(() => undefined)
     );
-    str = _lines.join("\n");
-    colorLines = _colorLines;
-  }
-  let lx = 0;
-  let ly = 0;
-  for (let i = 0; i < str.length; i++) {
-    const c = str[i];
-    if (c === "\n") {
-      x = bx;
-      y++;
-      lx = 0;
-      ly++;
-      continue;
-    }
-    if (x < 0 || x >= size.x || y < 0 || y >= size.y) {
-      x++;
-      lx++;
-      continue;
-    }
-    charGrid[x][y] = c;
-    colorGrid[x][y] = text.getCharFromLines(colorLines, lx, ly);
-    backgroundColorGrid[x][y] = text.getCharFromLines(
-      backgroundColorLines,
-      lx,
-      ly
+    this.colorGrid = range(this.size.x).map(() =>
+      range(this.size.y).map(() => undefined)
     );
-    rotationGrid[x][y] = text.getCharFromLines(rotationLines, lx, ly);
-    symbolGrid[x][y] = text.getCharFromLines(symbolLines, lx, ly);
-    x++;
-    lx++;
+    this.backgroundColorGrid = range(this.size.x).map(() =>
+      range(this.size.y).map(() => undefined)
+    );
+    this.rotationGrid = range(this.size.x).map(() =>
+      range(this.size.y).map(() => undefined)
+    );
+    this.symbolGrid = range(this.size.x).map(() =>
+      range(this.size.y).map(() => undefined)
+    );
   }
-}
 
-export function getCharAt(_x: number, _y: number) {
-  if (_x < 0 || _x >= size.x || _y < 0 || _y >= size.y) {
-    return undefined;
-  }
-  const x = Math.floor(_x);
-  const y = Math.floor(_y);
-  const char = charGrid[x][y];
-  const cg = colorGrid[x][y];
-  const bg = backgroundColorGrid[x][y];
-  const rg = rotationGrid[x][y];
-  const sg = symbolGrid[x][y];
-  return { char, options: text.getCharOption(cg, bg, rg, sg) };
-}
-
-export function setCharAt(
-  _x: number,
-  _y: number,
-  char: string,
-  options?: text.CharOptions
-) {
-  if (_x < 0 || _x >= size.x || _y < 0 || _y >= size.y) {
-    return;
-  }
-  const x = Math.floor(_x);
-  const y = Math.floor(_y);
-  charGrid[x][y] = char;
-  if (options == null) {
-    colorGrid[x][y] = backgroundColorGrid[x][y] = rotationGrid[x][
-      y
-    ] = undefined;
-    return;
-  }
-  colorGrid[x][y] = options.color;
-  backgroundColorGrid[x][y] = options.backgroundColor;
-  if (options.angleIndex == null) {
-    rotationGrid[x][y] = undefined;
-  } else {
-    let ri = options.angleIndex;
-    if (options.isMirrorX) {
-      ri |= 4;
+  print(_str: string, _x: number, _y: number, options: text.Options = {}) {
+    let x = Math.floor(_x);
+    let y = Math.floor(_y);
+    const bx = x;
+    let colorLines =
+      options.colorPattern != null
+        ? options.colorPattern.split("\n")
+        : undefined;
+    const backgroundColorLines =
+      options.backgroundColorPattern != null
+        ? options.backgroundColorPattern.split("\n")
+        : undefined;
+    const rotationLines =
+      options.rotationPattern != null
+        ? options.rotationPattern.split("\n")
+        : undefined;
+    const symbolLines =
+      options.symbolPattern != null
+        ? options.symbolPattern.split("\n")
+        : undefined;
+    let str = _str;
+    if (options.charAndColorPattern != null) {
+      const [_lines, _colorLines] = text.getColorLines(
+        options.charAndColorPattern
+      );
+      str = _lines.join("\n");
+      colorLines = _colorLines;
     }
-    if (options.isMirrorY) {
-      ri |= 8;
-    }
-    rotationGrid[x][y] = text.rotationChars.charAt(ri);
-  }
-  symbolGrid[x][y] = options.isSymbol ? "s" : undefined;
-}
-
-export function draw() {
-  for (let x = 0; x < size.x; x++) {
-    for (let y = 0; y < size.y; y++) {
-      const c = charGrid[x][y];
-      if (c == null) {
+    let lx = 0;
+    let ly = 0;
+    for (let i = 0; i < str.length; i++) {
+      const c = str[i];
+      if (c === "\n") {
+        x = bx;
+        y++;
+        lx = 0;
+        ly++;
         continue;
       }
-      const cg = colorGrid[x][y];
-      const bg = backgroundColorGrid[x][y];
-      const rg = rotationGrid[x][y];
-      const sg = symbolGrid[x][y];
-      text.printChar(c, x * text.letterSize, y * text.letterSize, {
-        ...text.getCharOption(cg, bg, rg, sg),
-        ...{ scale: 1, alpha: 1 }
-      });
+      if (x < 0 || x >= this.size.x || y < 0 || y >= this.size.y) {
+        x++;
+        lx++;
+        continue;
+      }
+      this.charGrid[x][y] = c;
+      this.colorGrid[x][y] = text.getCharFromLines(colorLines, lx, ly);
+      this.backgroundColorGrid[x][y] = text.getCharFromLines(
+        backgroundColorLines,
+        lx,
+        ly
+      );
+      this.rotationGrid[x][y] = text.getCharFromLines(rotationLines, lx, ly);
+      this.symbolGrid[x][y] = text.getCharFromLines(symbolLines, lx, ly);
+      x++;
+      lx++;
     }
   }
-}
 
-export function clear() {
-  for (let x = 0; x < size.x; x++) {
-    for (let y = 0; y < size.y; y++) {
-      charGrid[x][y] = colorGrid[x][y] = backgroundColorGrid[x][
-        y
-      ] = rotationGrid[x][y] = symbolGrid[x][y] = undefined;
+  getCharAt(_x: number, _y: number) {
+    if (_x < 0 || _x >= this.size.x || _y < 0 || _y >= this.size.y) {
+      return undefined;
+    }
+    const x = Math.floor(_x);
+    const y = Math.floor(_y);
+    const char = this.charGrid[x][y];
+    const cg = this.colorGrid[x][y];
+    const bg = this.backgroundColorGrid[x][y];
+    const rg = this.rotationGrid[x][y];
+    const sg = this.symbolGrid[x][y];
+    return { char, options: text.getCharOption(cg, bg, rg, sg) };
+  }
+
+  setCharAt(_x: number, _y: number, char: string, options?: text.CharOptions) {
+    if (_x < 0 || _x >= this.size.x || _y < 0 || _y >= this.size.y) {
+      return;
+    }
+    const x = Math.floor(_x);
+    const y = Math.floor(_y);
+    this.charGrid[x][y] = char;
+    if (options == null) {
+      this.colorGrid[x][y] = this.backgroundColorGrid[x][y] = this.rotationGrid[
+        x
+      ][y] = undefined;
+      return;
+    }
+    this.colorGrid[x][y] = options.color;
+    this.backgroundColorGrid[x][y] = options.backgroundColor;
+    if (options.angleIndex == null) {
+      this.rotationGrid[x][y] = undefined;
+    } else {
+      let ri = options.angleIndex;
+      if (options.isMirrorX) {
+        ri |= 4;
+      }
+      if (options.isMirrorY) {
+        ri |= 8;
+      }
+      this.rotationGrid[x][y] = text.rotationChars.charAt(ri);
+    }
+    this.symbolGrid[x][y] = options.isSymbol ? "s" : undefined;
+  }
+
+  draw() {
+    for (let x = 0; x < this.size.x; x++) {
+      for (let y = 0; y < this.size.y; y++) {
+        const c = this.charGrid[x][y];
+        if (c == null) {
+          continue;
+        }
+        const cg = this.colorGrid[x][y];
+        const bg = this.backgroundColorGrid[x][y];
+        const rg = this.rotationGrid[x][y];
+        const sg = this.symbolGrid[x][y];
+        text.printChar(c, x * text.letterSize, y * text.letterSize, {
+          ...text.getCharOption(cg, bg, rg, sg),
+          ...{ scale: 1, alpha: 1 }
+        });
+      }
     }
   }
-}
 
-export function getState() {
-  return {
-    charGrid: charGrid.map(l => [].concat(l)),
-    colorGrid: colorGrid.map(l => [].concat(l)),
-    backgroundColorGrid: backgroundColorGrid.map(l => [].concat(l)),
-    rotationGrid: rotationGrid.map(l => [].concat(l)),
-    symbolGrid: symbolGrid.map(l => [].concat(l))
-  };
-}
+  clear() {
+    for (let x = 0; x < this.size.x; x++) {
+      for (let y = 0; y < this.size.y; y++) {
+        this.charGrid[x][y] = this.colorGrid[x][y] = this.backgroundColorGrid[
+          x
+        ][y] = this.rotationGrid[x][y] = this.symbolGrid[x][y] = undefined;
+      }
+    }
+  }
 
-export function setState(state) {
-  charGrid = state.charGrid.map(l => [].concat(l));
-  colorGrid = state.colorGrid.map(l => [].concat(l));
-  backgroundColorGrid = state.backgroundColorGrid.map(l => [].concat(l));
-  rotationGrid = state.rotationGrid.map(l => [].concat(l));
-  symbolGrid = state.symbolGrid.map(l => [].concat(l));
+  getState() {
+    return {
+      charGrid: this.charGrid.map(l => [].concat(l)),
+      colorGrid: this.colorGrid.map(l => [].concat(l)),
+      backgroundColorGrid: this.backgroundColorGrid.map(l => [].concat(l)),
+      rotationGrid: this.rotationGrid.map(l => [].concat(l)),
+      symbolGrid: this.symbolGrid.map(l => [].concat(l))
+    };
+  }
+
+  setState(state) {
+    this.charGrid = state.charGrid.map(l => [].concat(l));
+    this.colorGrid = state.colorGrid.map(l => [].concat(l));
+    this.backgroundColorGrid = state.backgroundColorGrid.map(l => [].concat(l));
+    this.rotationGrid = state.rotationGrid.map(l => [].concat(l));
+    this.symbolGrid = state.symbolGrid.map(l => [].concat(l));
+  }
 }

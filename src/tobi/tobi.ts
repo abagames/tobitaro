@@ -52,11 +52,6 @@ function onLoad() {
     options.isCapturing
   );
   input.init(options.isUsingVirtualPad, options.isFourWaysStick);
-  const terminalSize = {
-    x: Math.ceil(view.size.x / text.letterSize),
-    y: Math.ceil(view.size.y / text.letterSize)
-  };
-  terminal.init(terminalSize);
   text.init();
   _init();
   update();

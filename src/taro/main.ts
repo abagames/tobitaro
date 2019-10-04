@@ -1,7 +1,7 @@
 import * as tobi from "../tobi/tobi";
 import * as view from "../tobi/view";
 import * as text from "../tobi/text";
-import * as terminal from "../tobi/terminal";
+import { Terminal } from "../tobi/terminal";
 import * as input from "../tobi/input";
 import * as actor from "../tobi/actor";
 import { Random } from "../tobi/random";
@@ -18,6 +18,7 @@ let updateFunc = {
 };
 let ticks = 0;
 let score = 0;
+let terminal: Terminal;
 let random = new Random();
 
 tobi.init(init, update, {
@@ -29,6 +30,7 @@ tobi.init(init, update, {
 
 function init() {
   sound.init(10);
+  terminal = new Terminal({ x: 20, y: 10 });
   actor.setActorClass(Actor);
   text.defineSymbols(charPatterns, "A");
   initTitle();
