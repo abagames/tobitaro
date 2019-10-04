@@ -1,4 +1,4 @@
-import * as tobi from "../tobi/tobi";
+import * as main from "../tobi/main";
 import * as view from "../tobi/view";
 import * as text from "../tobi/text";
 import { Terminal } from "../tobi/terminal";
@@ -21,7 +21,7 @@ let score = 0;
 let terminal: Terminal;
 let random = new Random();
 
-tobi.init(init, update, {
+main.init(init, update, {
   viewSize: { x: 120, y: 60 },
   bodyBackground: "#ddd",
   viewBackground: "#eee",
