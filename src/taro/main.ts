@@ -4,13 +4,13 @@ import {
   random,
   clearJustPressed,
   isJustReleased
-} from "../util/main";
-import * as view from "../util/view";
-import * as text from "../util/text";
-import * as terminal from "../util/terminal";
-import * as sga from "../util/simpleGameActor";
-import { Vector } from "../util/vector";
-import { range } from "../util/math";
+} from "../tobi/tobi";
+import * as view from "../tobi/view";
+import * as text from "../tobi/text";
+import * as terminal from "../tobi/terminal";
+import * as sga from "../tobi/simpleGameActor";
+import { Vector } from "../tobi/vector";
+import { range } from "../tobi/math";
 import * as sss from "sounds-some-sounds";
 
 type State = "title" | "inGame" | "gameOver";
