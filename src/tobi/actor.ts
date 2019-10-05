@@ -176,7 +176,7 @@ export function reset() {
 }
 
 export function get(func?: Function) {
-  pool.get(func);
+  return pool.get(func);
 }
 
 export function setActorClass(_actorClass: any) {
