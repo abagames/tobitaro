@@ -160,6 +160,24 @@ export class Terminal {
     }
   }
 
+  scrollUp() {
+    for (let x = 0; x < this.size.x; x++) {
+      for (let y = 1; y < this.size.y; y++) {
+        this.charGrid[x][y - 1] = this.charGrid[x][y];
+        this.colorGrid[x][y - 1] = this.colorGrid[x][y];
+        this.backgroundColorGrid[x][y - 1] = this.backgroundColorGrid[x][y];
+        this.rotationGrid[x][y - 1] = this.rotationGrid[x][y];
+        this.symbolGrid[x][y - 1] = this.symbolGrid[x][y];
+      }
+    }
+    const y = this.size.y - 1;
+    for (let x = 0; x < this.size.x; x++) {
+      this.charGrid[x][y] = this.colorGrid[x][y] = this.backgroundColorGrid[x][
+        y
+      ] = this.rotationGrid[x][y] = this.symbolGrid[x][y] = undefined;
+    }
+  }
+
   getState() {
     return {
       charGrid: this.charGrid.map(l => [].concat(l)),
