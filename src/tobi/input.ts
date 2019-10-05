@@ -54,6 +54,9 @@ export function update() {
   isPressed = keyboard.isPressed || pointer.isPressed;
   isJustPressed = keyboard.isJustPressed || pointer.isJustPressed;
   isJustReleased = keyboard.isJustReleased || pointer.isJustReleased;
+}
+
+export function draw() {
   if (isUsingVirtualPad && pointer.isPressed) {
     text.print("c", view.size.x / 2 - 2, view.size.y / 2 - 2, {
       colorPattern: "b",

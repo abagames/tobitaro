@@ -62,6 +62,7 @@ function update() {
   sound.update();
   input.update();
   _update();
+  input.draw();
   if (options.isCapturing) {
     view.capture();
   }
