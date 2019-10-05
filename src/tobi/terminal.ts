@@ -74,14 +74,22 @@ export class Terminal {
         continue;
       }
       this.charGrid[x][y] = c;
-      this.colorGrid[x][y] = text.getCharFromLines(colorLines, lx, ly);
-      this.backgroundColorGrid[x][y] = text.getCharFromLines(
-        backgroundColorLines,
-        lx,
-        ly
-      );
-      this.rotationGrid[x][y] = text.getCharFromLines(rotationLines, lx, ly);
-      this.symbolGrid[x][y] = text.getCharFromLines(symbolLines, lx, ly);
+      this.colorGrid[x][y] =
+        options.color != null
+          ? options.color
+          : text.getCharFromLines(colorLines, lx, ly);
+      this.backgroundColorGrid[x][y] =
+        options.backgroundColor != null
+          ? options.backgroundColor
+          : text.getCharFromLines(backgroundColorLines, lx, ly);
+      this.rotationGrid[x][y] =
+        options.rotation != null
+          ? options.rotation
+          : text.getCharFromLines(rotationLines, lx, ly);
+      this.symbolGrid[x][y] =
+        options.symbol != null
+          ? options.symbol
+          : text.getCharFromLines(symbolLines, lx, ly);
       x++;
       lx++;
     }

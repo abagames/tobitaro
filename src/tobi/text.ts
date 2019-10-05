@@ -45,9 +45,13 @@ type ColorChar =
 export const rotationChars = "kljhnmbvopiu9087";
 
 export type Options = {
+  color?: string;
   colorPattern?: string;
+  backgroundColor?: string;
   backgroundColorPattern?: string;
+  rotation?: string;
   rotationPattern?: string;
+  symbol?: string;
   symbolPattern?: string;
   charAndColorPattern?: string;
   scale?: number;
@@ -148,10 +152,18 @@ export function print(
     }
     printChar(c, px, py, {
       ...getCharOption(
-        getCharFromLines(colorLines, lx, ly),
-        getCharFromLines(backgroundColorLines, lx, ly),
-        getCharFromLines(rotationLines, lx, ly),
-        getCharFromLines(symbolLines, lx, ly)
+        options.color != null
+          ? options.color
+          : getCharFromLines(colorLines, lx, ly),
+        options.backgroundColor != null
+          ? options.backgroundColor
+          : getCharFromLines(backgroundColorLines, lx, ly),
+        options.rotation != null
+          ? options.rotation
+          : getCharFromLines(rotationLines, lx, ly),
+        options.symbol != null
+          ? options.symbol
+          : getCharFromLines(symbolLines, lx, ly)
       ),
       ...{ scale, alpha }
     });
