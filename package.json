@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Jump taro",
   "config": {
-    "game": "taro"
+    "game": "buried"
   },
   "scripts": {
     "watch": "cross-conf-env parcel src/%npm_package_config_game%/index.html -d tmp",
