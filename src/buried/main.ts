@@ -45,7 +45,7 @@ function update() {
   updateFunc[state]();
   actor.update();
   if (score > 0) {
-    const ss = `${score}`;
+    const ss = `${score} `;
     terminal.print(ss, 0, 0, {
       color: "l",
       backgroundColor: "w"
@@ -103,8 +103,11 @@ function updateInGame() {
     nextExtendScore += 100;
     isExtending = true;
   }
-  for (let i = 0; i < life; i++) {
-    terminal.print("E", i, 11, {
+  if (life > 0) {
+    const ls = `${range(life)
+      .map(() => "E")
+      .join("")} `;
+    terminal.print(ls, 0, 11, {
       color: "l",
       backgroundColor: "w",
       symbol: "s"
@@ -168,7 +171,7 @@ function player(a: Actor) {
         coinMultiplier = 1;
       }
       if (coinMultiplier > 1) {
-        const ms = `+${coinMultiplier}`;
+        const ms = ` +${coinMultiplier}`;
         terminal.print(ms, 20 - ms.length, 0, {
           color: "l",
           backgroundColor: "w"
@@ -411,7 +414,7 @@ function initGameOver() {
 }
 
 function updateGameOver() {
-  terminal.print("GAME OVER", 5, 3, { color: "l", backgroundColor: "w" });
+  terminal.print(" GAME OVER ", 4, 3, { color: "l", backgroundColor: "w" });
   if (ticks > 20 && input.isJustPressed) {
     initInGame();
   } else if (ticks > 300) {
